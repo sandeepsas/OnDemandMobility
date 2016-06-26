@@ -43,8 +43,6 @@ public class StartHere {
 			Iterator<KdTree.XYZPoint> near_bys_itr =
 					near_bys.iterator();
 			GraphNode closestNode = near_bys_itr.next().toGraphNode();
-
-
 		}
 		
 

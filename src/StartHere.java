@@ -26,7 +26,7 @@ public class StartHere {
 		while(node_itr.hasNext()){
 			GraphNode tempNode = node_itr.next();
 			graphNodeList.add(new KdTree.XYZPoint(""+tempNode.getId(), 
-					tempNode.getLat(), tempNode.getLon(), 0));
+					tempNode.getLat(), tempNode.getLon(), ""+0));
 		}
 		KdTree kdtree = new KdTree<KdTree.XYZPoint>(graphNodeList);
 		
@@ -39,7 +39,7 @@ public class StartHere {
 			
 			//Extract destination lat long and convert to node
 			KdTree.XYZPoint dest_A = new KdTree.XYZPoint(trip_A.getMedallion(), 
-					trip_A.getDropOffLat(), trip_A.getDropOffLon(), 0);
+					trip_A.getDropOffLat(), trip_A.getDropOffLon(), ""+0);
 			//Search for nearest vertex
 			Collection<KdTree.XYZPoint> near_bys = kdtree.nearestNeighbourSearch(dest_A,0.06);
 			Iterator<KdTree.XYZPoint> near_bys_itr =

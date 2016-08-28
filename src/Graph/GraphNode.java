@@ -30,7 +30,7 @@ public class GraphNode implements Serializable{
 		this.id = 0;
 	}
 	public KdTree.XYZPoint toXYZPoint(){
-		return new KdTree.XYZPoint(""+this.id,this.lat,this.lon,0);
+		return new KdTree.XYZPoint(""+this.id,this.lat,this.lon,""+0);
 	}
 	
 	public GraphNode(double lat, double lon, long id) {

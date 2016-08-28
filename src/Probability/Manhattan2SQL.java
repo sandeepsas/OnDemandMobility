@@ -1,5 +1,4 @@
-package sqldump;
-
+package Probability;
 
 import java.io.*;
 import java.sql.*;
@@ -11,25 +10,26 @@ import org.joda.time.format.DateTimeFormatter;
 
 import Trip.KdTree;
 import Trip.KdTree.XYZPoint;
+import sqldump.ManhattanFilter;
 
-public class TripFileProcessor implements Runnable {
+public class Manhattan2SQL{
 
 	private File currentFile;
 	private long skippedTrips = 0;
 	private Connection cnn;
-	
+	KdTree<XYZPoint> tree;
 
 	public static SimpleDateFormat dt_format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	public static DateTimeFormatter dt_formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
-	public TripFileProcessor(File currentFile, Connection c){
+	public Manhattan2SQL(File currentFile, Connection c, KdTree<XYZPoint> ktree){
 		this.currentFile = currentFile;
 		this.cnn = c;
-		
+		this.tree = ktree;
+		runFile();
 	}
 
-	@Override
-	public void run() {
+	public void runFile() {
 		BufferedReader file_reader = null;
 		try {
 			file_reader = new BufferedReader(new FileReader(currentFile));
@@ -37,7 +37,7 @@ public class TripFileProcessor implements Runnable {
 			while((file_line=file_reader.readLine())!=null 
 					&& file_line.length()!=0){
 				String[] file_line_split = file_line.split(",");
-				if(file_line_split.length==14){
+				if(file_line_split.length==8){
 					checkAndDump(file_line_split);
 				}else{
 					skippedTrips++;
@@ -61,16 +61,19 @@ public class TripFileProcessor implements Runnable {
 	}
 
 	private void checkAndDump(String[] file_line_split) throws ParseException {
-		String medallion = file_line_split[0];
-		long pickup_datetime = getUNIXTime(file_line_split[5]);
-		long dropoff_datetime = getUNIXTime(file_line_split[6]);
+
+		String tripID = file_line_split[0];
+		long pickup_datetime = getUNIXTime(file_line_split[1]);
+		long dropoff_datetime = getUNIXTime(file_line_split[2]);
 		String passenger_count = file_line_split[7];
 
 		try{
-			double pickup_longitude = Double.parseDouble(file_line_split[10]);
-			double pickup_latitude = Double.parseDouble(file_line_split[11]);
-			double dropoff_longitude = Double.parseDouble(file_line_split[12]);
-			double dropoff_latitude = Double.parseDouble(file_line_split[13]);
+			double pickup_longitude = Double.parseDouble(file_line_split[3]);
+			double pickup_latitude = Double.parseDouble(file_line_split[4]);
+			double dropoff_longitude = Double.parseDouble(file_line_split[5]);
+			double dropoff_latitude = Double.parseDouble(file_line_split[6]);
+			
+			String linkID = getLinkID(pickup_latitude,pickup_longitude);
 			if(!ManhattanFilter.inManhattan(pickup_latitude, pickup_longitude)){
 				skippedTrips++;
 				return;
@@ -90,9 +93,9 @@ public class TripFileProcessor implements Runnable {
 				return;
 			}
 
-			String sql = "INSERT INTO MHTRIPS (MEDALLION,PICKUPDATETIME,DROPOFFDATETIME,"
+			String sql = "INSERT INTO MHTRIPS (LINKID,PICKUPDATETIME,DROPOFFDATETIME,"
 					+ "PICKUPLAT,PICKUPLNG,DROPOFFLAT,DROPOFFLNG,PASSCNT) " +
-					"VALUES ("+medallion+","+ pickup_datetime+","+dropoff_datetime+","+pickup_latitude+","+
+					"VALUES ("+linkID+","+ pickup_datetime+","+dropoff_datetime+","+pickup_latitude+","+
 					pickup_longitude+","+dropoff_latitude+","+ dropoff_longitude+","+passenger_count  +")"; 
 			//System.out.println(sql);
 			Statement stmt = null;
@@ -113,9 +116,30 @@ public class TripFileProcessor implements Runnable {
 
 	}
 
+	private String getLinkID(double latitude, double longitude) {
+		String linkID = "";
+		KdTree.XYZPoint nearestNode = getNNNode(new KdTree.XYZPoint("",
+				latitude, longitude,""+0));
+		linkID = nearestNode.linearID;
+		return  linkID;
+	}
+
 	private long getUNIXTime(String pickup_datetime) {
 		long time = dt_formatter.parseDateTime(pickup_datetime).getMillis();
-		return time;
+		return time/1000L;
+	}
+	
+	/*Returns a nearest node*/
+	public KdTree.XYZPoint getNNNode(KdTree.XYZPoint node){
+
+		//Search for nearest vertex
+		Collection<KdTree.XYZPoint> near_bys = tree.nearestNeighbourSearch(node,0.06);
+		Iterator<KdTree.XYZPoint> near_bys_itr =
+				near_bys.iterator();
+		KdTree.XYZPoint elt = near_bys_itr.next();
+
+		return elt;
+
 	}
 
 

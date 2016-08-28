@@ -559,18 +559,18 @@ public class KdTree<T extends KdTree.XYZPoint> {
 		public double x = Double.NEGATIVE_INFINITY;
 		public double y = Double.NEGATIVE_INFINITY;
 		public double z = Double.NEGATIVE_INFINITY;
-		public String linearID = null;
-		public long travel_time = 0;
+		public String linearID;
+		public String misc = null;
 
 
 		public XYZPoint(String linearID,
 				double mid_x, double mid_y,
-				 long travel_time) {
+				 String misc) {
 			this.x = mid_x;
 			this.y = mid_y;
 			this.z = 0;
 			this.linearID = linearID;
-			this.travel_time = travel_time;
+			this.misc = misc;
 		}
 
 /*		public XYZPoint(double x, double y, double z) {

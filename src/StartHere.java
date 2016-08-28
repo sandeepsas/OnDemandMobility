@@ -13,7 +13,9 @@ public class StartHere {
 		// Load the Graph
 		ObjectInputStream oos_graph_read = new ObjectInputStream(new 
 				FileInputStream("ObjectWarehouse/GraphObjects/NYCRoadGraph.obj"));
-		DefaultDirectedWeightedGraph gr_t = new  DefaultDirectedWeightedGraph <GraphNode,DefaultWeightedEdge>(DefaultWeightedEdge.class);
+		DefaultDirectedWeightedGraph gr_t = new  
+				DefaultDirectedWeightedGraph <GraphNode,DefaultWeightedEdge>(DefaultWeightedEdge.class);
+		
 		gr_t =  (DefaultDirectedWeightedGraph<GraphNode, DefaultWeightedEdge>) oos_graph_read.readObject();
 		oos_graph_read.close();
 		

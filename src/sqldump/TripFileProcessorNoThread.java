@@ -89,6 +89,8 @@ public class TripFileProcessorNoThread {
 			double pickup_latitudeD = Double.parseDouble(pickup_latitude);
 			double dropoff_longitudeD = Double.parseDouble(dropoff_longitude);
 			double dropoff_latitudeD = Double.parseDouble(dropoff_latitude);
+			
+			
 			if(!ManhattanFilter.inManhattan(pickup_latitudeD, pickup_longitudeD)){
 				skippedTrips++;
 				return;
@@ -115,25 +117,24 @@ public class TripFileProcessorNoThread {
 				skippedTrips++;
 				return;
 			}
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append(tripID+",");
+			sb.append(tpep_pickup_datetime+",");
+			sb.append(tpep_dropoff_datetime+",");
+			sb.append(pickup_longitudeD+",");
+			sb.append(pickup_latitudeD+",");
+			sb.append(dropoff_longitudeD+",");
+			sb.append(dropoff_latitudeD+",");
+			sb.append(passenger_count);
+			writer.println(sb.toString());
+			tripID++;
 
 			
 		}catch(NumberFormatException nfe){
 			skippedTrips++;
 			System.out.println("Number Format Exception = "+ file_line);
-		}finally{
-			StringBuilder sb = new StringBuilder();
-			sb.append(tripID+",");
-			sb.append(tpep_pickup_datetime+",");
-			sb.append(tpep_dropoff_datetime+",");
-			sb.append(pickup_longitude+",");
-			sb.append(pickup_latitude+",");
-			sb.append(dropoff_longitude+",");
-			sb.append(dropoff_latitude+",");
-			sb.append(passenger_count);
-			writer.println(sb.toString());
-			tripID++;
 		}
-
 
 
 	}

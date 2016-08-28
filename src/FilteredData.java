@@ -16,7 +16,7 @@ public class FilteredData {
 			TripFileProcessorNoThread tripFileProcess = new TripFileProcessorNoThread(idx_file);
 			System.out.println("Skipped Lines = "+tripFileProcess.skippedTrips);
 			System.out.println("Total Lines = "+tripFileProcess.totalTrips);
-			double error = (tripFileProcess.skippedTrips/tripFileProcess.totalTrips)*100.00;
+			float error = (float) ((float)(tripFileProcess.skippedTrips/tripFileProcess.totalTrips)*100.00);
 			System.out.println("Error % = "+error);
 		}
 		

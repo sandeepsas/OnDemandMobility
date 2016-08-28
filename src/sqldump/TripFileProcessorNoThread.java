@@ -1,14 +1,8 @@
 package sqldump;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
+import java.io.*;
+
+import java.text.*;
 import java.text.SimpleDateFormat;
 
 import org.joda.time.format.DateTimeFormat;
@@ -19,12 +13,23 @@ public class TripFileProcessorNoThread {
 	private File currentFile;
 	public long skippedTrips = 0;
 	public long totalTrips = 0;
+	public long tripID = 1;
 	String file_line ;
+	
+	PrintWriter writer;
 	
 	public static SimpleDateFormat dt_format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	public static DateTimeFormatter dt_formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 	
-	public TripFileProcessorNoThread(File currentFile){
+	public TripFileProcessorNoThread(File currentFile) throws FileNotFoundException, UnsupportedEncodingException{
+		//writer = new PrintWriter("manhattanTrips.csv", "UTF-8");
+		File outputWriter = new File("manhattanTrips.csv");
+		if(outputWriter.exists()){
+			outputWriter.delete();
+		}
+		
+		writer = new PrintWriter(new FileOutputStream(
+				outputWriter, true ));
 		BufferedReader file_reader = null;
 		try {
 			file_reader = new BufferedReader(new FileReader(currentFile));
@@ -50,6 +55,7 @@ public class TripFileProcessorNoThread {
 			try {
 				file_reader.close();
 				System.out.println("Skipped Lines from "+currentFile.getName()+" = "+skippedTrips);
+				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -83,23 +89,23 @@ public class TripFileProcessorNoThread {
 			double pickup_latitudeD = Double.parseDouble(pickup_latitude);
 			double dropoff_longitudeD = Double.parseDouble(dropoff_longitude);
 			double dropoff_latitudeD = Double.parseDouble(dropoff_latitude);
-			/*if(!ManhattanFilter.inManhattan(pickup_latitudeD, pickup_longitudeD)){
+			if(!ManhattanFilter.inManhattan(pickup_latitudeD, pickup_longitudeD)){
 				skippedTrips++;
 				return;
-			}*/
+			}
 
 			if(pickup_longitudeD==0 ||
 					pickup_latitudeD==0 ||
 					dropoff_longitudeD==0 ||
 					dropoff_latitudeD==0 ){
-				System.out.println("Lat Long ZERO -> "+file_line);
+				//System.out.println("Lat Long ZERO -> "+file_line);
 				skippedTrips++;
 				return;
 			}
 
 
 			if(ManhattanFilter.distFrom(dropoff_latitudeD, dropoff_longitudeD, pickup_latitudeD, pickup_longitudeD)<0.1){
-				System.out.println("SHORT TRIP -> "+file_line);
+				//System.out.println("SHORT TRIP -> "+file_line);
 				skippedTrips++;
 				return;
 			}
@@ -108,6 +114,18 @@ public class TripFileProcessorNoThread {
 		}catch(NumberFormatException nfe){
 			skippedTrips++;
 			System.out.println("Number Format Exception = "+ file_line);
+		}finally{
+			StringBuilder sb = new StringBuilder();
+			sb.append(tripID+",");
+			sb.append(tpep_pickup_datetime+",");
+			sb.append(tpep_dropoff_datetime+",");
+			sb.append(pickup_longitude+",");
+			sb.append(pickup_latitude+",");
+			sb.append(dropoff_longitude+",");
+			sb.append(dropoff_latitude+",");
+			sb.append(passenger_count);
+			writer.println(sb.toString());
+			tripID++;
 		}
 
 

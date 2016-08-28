@@ -21,15 +21,9 @@ public class TripFileProcessorNoThread {
 	public static SimpleDateFormat dt_format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	public static DateTimeFormatter dt_formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 	
-	public TripFileProcessorNoThread(File currentFile) throws FileNotFoundException, UnsupportedEncodingException{
+	public TripFileProcessorNoThread(File currentFile, PrintWriter writer) throws FileNotFoundException, UnsupportedEncodingException{
 		//writer = new PrintWriter("manhattanTrips.csv", "UTF-8");
-		File outputWriter = new File("manhattanTrips.csv");
-		if(outputWriter.exists()){
-			outputWriter.delete();
-		}
-		
-		writer = new PrintWriter(new FileOutputStream(
-				outputWriter, true ));
+		this.writer = writer;
 		BufferedReader file_reader = null;
 		try {
 			file_reader = new BufferedReader(new FileReader(currentFile));
@@ -55,7 +49,6 @@ public class TripFileProcessorNoThread {
 			try {
 				file_reader.close();
 				System.out.println("Skipped Lines from "+currentFile.getName()+" = "+skippedTrips);
-				writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

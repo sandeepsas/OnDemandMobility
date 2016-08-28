@@ -38,7 +38,7 @@ public class GenerateFiles {
 		
 		LinkedList<GraphNode> nodes = g.nodes;
 		LinkedList<DirectedEdge> edges = g.edges;
-		
+		System.out.println("Map Parsing Ended");
 		/*Iterate through edges, get mid point of road and load kd tree*/
 		KdTree<XYZPoint> sbTree = new KdTree<XYZPoint>();
 		List<XYZPoint> roadEdgeMidPointList = new ArrayList<XYZPoint>(); 
@@ -53,7 +53,7 @@ public class GenerateFiles {
 			streetID++;
 		}
 		sbTree = new KdTree<XYZPoint>(roadEdgeMidPointList);
-		
+		System.out.println("Tree Loaded");
 		/*Create SQL database*/
 		File dbFile = new File("manhattantrips.db");
 		if(dbFile.exists()){
@@ -66,8 +66,9 @@ public class GenerateFiles {
 		createDatabase();
 		openDatabase();
 		Manhattan2SQL mnsql = new Manhattan2SQL(new File("manhattan.csv"),c, sbTree);
+		System.out.println("************COMMITTING************");
 		c.commit();
-		
+		System.out.println("!!!!!!! DONE !!!!!!!!!!!!!!!!");
 
 	}
 	private static void openDatabase() {
@@ -108,7 +109,7 @@ public class GenerateFiles {
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 			System.exit(0);
 		}
-		System.out.println("Opened database successfully");
+		System.out.println("Created database successfully");
 	}
 
 

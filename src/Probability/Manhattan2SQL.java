@@ -63,6 +63,7 @@ public class Manhattan2SQL{
 	private void checkAndDump(String[] file_line_split) throws ParseException {
 
 		String tripID = file_line_split[0];
+		System.out.println("Trip ID === "+tripID);
 		long pickup_datetime = getUNIXTime(file_line_split[1]);
 		long dropoff_datetime = getUNIXTime(file_line_split[2]);
 		String passenger_count = file_line_split[7];

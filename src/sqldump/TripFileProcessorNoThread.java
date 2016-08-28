@@ -109,6 +109,12 @@ public class TripFileProcessorNoThread {
 				skippedTrips++;
 				return;
 			}
+			
+			if(ManhattanFilter.distFrom(dropoff_latitudeD, dropoff_longitudeD, pickup_latitudeD, pickup_longitudeD)>250){
+				//System.out.println("VERY LONG TRIP -> "+file_line);
+				skippedTrips++;
+				return;
+			}
 
 			
 		}catch(NumberFormatException nfe){
